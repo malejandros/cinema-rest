@@ -34,4 +34,25 @@ public class Cinema {
             }
         }
     }
+
+    public Seat getSeatByRowAndColumn(int row, int column) {
+        for(Seat s: seats) {
+            if(s.getRow() == row && s.getColumn() == column) {
+                return s;
+            }
+        }
+        throw new IndexOutOfBoundsException("The number of a row or a column is out of bounds!");
+    }
+
+    public Seat getSeatByToken(String token) {
+        for(var seat: seats) {
+            if(seat.getToken() != null) {
+                if(seat.getToken().toString().equals(token)) {
+                    return seat;
+                }
+            }
+        }
+        throw new RuntimeException("Cannot find a Seat with token " + token);
+    }
+
 }
