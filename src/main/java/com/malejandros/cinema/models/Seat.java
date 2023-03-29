@@ -46,4 +46,9 @@ public class Seat {
     public UUID getToken() {
         return token;
     }
+
+    @Override
+    public String toString() {
+        return "row:" + row + " column:" + column + " price:" + price + " booked:" + booked + " token" + token;
+    }
 }
