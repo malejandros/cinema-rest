@@ -1,5 +1,6 @@
 package com.malejandros.cinema.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +13,7 @@ public class Cinema {
     @JsonProperty("available_seats")
     private List<Seat> seats = new ArrayList<>();
     private List<Seat> purchasedSeats = new ArrayList<>();
+    private int currentIncome;
 
     public Cinema(int rows, int columns) {
         this.rows = rows;
@@ -53,12 +55,38 @@ public class Cinema {
     }
 
     public void addPurchasedSeats(Seat seat) {
+        currentIncome += seat.getPrice();
         purchasedSeats.add(seat);
         seats.remove(seat);
     }
 
     public void addAvailableSeat(Seat seat) {
+        currentIncome -= seat.getPrice();
         seats.add(seat);
+        purchasedSeats.remove(seat);
+    }
+
+    @JsonIgnore
+    public int getCurrentIncome() {
+        if(purchasedSeats.isEmpty()) {
+            return 0;
+        } else {
+            int income = 0;
+            for(Seat s: purchasedSeats) {
+                income += s.getPrice();
+            }
+            return income;
+        }
+    }
+
+    @JsonIgnore
+    public int getNumberOfAvailableSeats() {
+        return seats.size();
+    }
+
+    @JsonIgnore
+    public int getNumberOfPurchasedTickets() {
+        return purchasedSeats.size();
     }
 
     @Override

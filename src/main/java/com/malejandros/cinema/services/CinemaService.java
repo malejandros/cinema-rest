@@ -52,4 +52,17 @@ public class CinemaService {
         }
     }
 
+    public Map<String, Integer> getStats(String password) {
+        if(password != null) {
+            if (password.equals("super_secret")) {
+                Map<String, Integer> map = new HashMap<>();
+                map.put("current_income", cinema.getCurrentIncome());
+                map.put("number_of_available_seats", cinema.getNumberOfAvailableSeats());
+                map.put("number_of_purchased_tickets", cinema.getNumberOfPurchasedTickets());
+                return map;
+            }
+        }
+        throw new RuntimeException("The password is wrong!");
+    }
+
 }

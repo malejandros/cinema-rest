@@ -1,19 +1,14 @@
 package com.malejandros.cinema.controllers;
 
-import com.fasterxml.jackson.core.JacksonException;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.malejandros.cinema.models.Cinema;
 import com.malejandros.cinema.models.Seat;
 import com.malejandros.cinema.models.Token;
 import com.malejandros.cinema.services.CinemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,9 +45,8 @@ public class CinemaController {
     }
 
     @PostMapping("/return")
-    public ResponseEntity<?> returnTicket(@RequestBody Token token) {
+    public ResponseEntity<?> refundTicket(@RequestBody Token token) {
         Map<String, Object> map = new HashMap<>();
-        String res;
         Token t = token;
         try {
             Seat s = cinemaService.returnTicket(t);
@@ -63,4 +57,20 @@ public class CinemaController {
             return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
         }
     }
+
+    @PostMapping("/stats{password}")
+    public ResponseEntity<?> getStats(@RequestParam String password) {
+        try {
+            Map<String, Integer> map = new HashMap<>();
+            map = cinemaService.getStats(password);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+
+        } catch (Exception e) {
+            Map<String, String> map = new HashMap<>();
+            map.put("error", e.getMessage());
+            return new ResponseEntity<>(map, HttpStatusCode.valueOf(401));
+        }
+    }
 }
+
+
