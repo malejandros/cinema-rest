@@ -2,6 +2,7 @@ package com.malejandros.cinema.services;
 
 import com.malejandros.cinema.models.Cinema;
 import com.malejandros.cinema.models.Seat;
+import com.malejandros.cinema.models.Token;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class CinemaService {
             UUID token = UUID.randomUUID();
             s.setToken(token);
             s.setBooked(true);
+            cinema.addPurchasedSeats(s);
             Map<String, Object> map = new HashMap<>();
             map.put("token", token);
             map.put("ticket", s);
@@ -38,5 +40,16 @@ public class CinemaService {
         }
     }
 
+    public Seat returnTicket(Token token) {
+        try {
+            Seat s = cinema.getPurchasedSeatByToken(token.getToken());
+            s.setBooked(false);
+            s.setToken(null);
+            cinema.addAvailableSeat(s);
+            return s;
+        } catch (Exception e) {
+            throw new IndexOutOfBoundsException(e.getMessage());
+        }
+    }
 
 }

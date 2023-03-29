@@ -5,6 +5,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.malejandros.cinema.models.Cinema;
 import com.malejandros.cinema.models.Seat;
+import com.malejandros.cinema.models.Token;
 import com.malejandros.cinema.services.CinemaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,10 +28,9 @@ public class CinemaController {
     }
 
     @GetMapping("/seats")
-    public ResponseEntity<String> getSeats() {
-        ObjectMapper objectMapper = new ObjectMapper();
+    public ResponseEntity<?> getSeats() {
         try {
-            String res = objectMapper.writeValueAsString(cinemaService.getSeats());
+            Cinema res = cinemaService.getSeats();
             return new ResponseEntity<>(res, HttpStatus.OK);
         } catch (Exception e) {
             return new ResponseEntity<>("An error was occurred on the server, please try again!", HttpStatus.SERVICE_UNAVAILABLE);
@@ -38,25 +38,29 @@ public class CinemaController {
     }
 
     @PostMapping("/purchase")
-    public ResponseEntity<String> purchaseSeat(@RequestBody Seat seat) {
-        ObjectMapper objectMapper = new ObjectMapper();
-        String res;
+    public ResponseEntity<?> purchaseSeat(@RequestBody Seat seat) {
         Map<String, Object> map = new HashMap<>();
         try {
-            try {
-                map = cinemaService.purchaseSeat(seat);
-                res = objectMapper.writeValueAsString(map);
-                return new ResponseEntity<>(res, HttpStatus.OK);
-            } catch (JacksonException e) {
-                return new ResponseEntity<>("An error was occurred on the server, please try again!", HttpStatus.SERVICE_UNAVAILABLE);
-            } catch (Exception e) {
+            map = cinemaService.purchaseSeat(seat);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch (Exception e) {
+            map.put("error", e.getMessage());
+            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
+        }
+    }
 
-                map.put("error", e.getMessage());
-                res = objectMapper.writeValueAsString(map);
-                return new ResponseEntity<>(res, HttpStatus.BAD_REQUEST);
-            }
-        } catch (JacksonException e) {
-            return new ResponseEntity<>("An error was occurred on the server, please try again!", HttpStatus.SERVICE_UNAVAILABLE);
+    @PostMapping("/return")
+    public ResponseEntity<?> returnTicket(@RequestBody Token token) {
+        Map<String, Object> map = new HashMap<>();
+        String res;
+        Token t = token;
+        try {
+            Seat s = cinemaService.returnTicket(t);
+            map.put("returned_ticket", s);
+            return new ResponseEntity<>(map, HttpStatus.OK);
+        } catch (Exception e) {
+            map.put("error", e.getMessage());
+            return new ResponseEntity<>(map, HttpStatus.BAD_REQUEST);
         }
     }
 }
